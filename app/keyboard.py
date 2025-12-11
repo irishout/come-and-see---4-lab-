@@ -1,6 +1,7 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-keyboard = [[KeyboardButton(text='тестовая конпка'), KeyboardButton(text='Поиск фильма')]]
+main_keyboard = [ KeyboardButton(text='Поиск фильма')], [KeyboardButton(text='Случайный фильм')]
+exit_to_main = [[KeyboardButton(text='Вернуться в меню')]]
 
-
-main = ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+main = ReplyKeyboardMarkup(keyboard=main_keyboard, resize_keyboard=True)
+exit = ReplyKeyboardMarkup(keyboard=exit_to_main, resize_keyboard=True)
