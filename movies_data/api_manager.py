@@ -25,15 +25,15 @@ def find_by_name(query:str):
         print(f'Ошибка: {response.status_code}')
 
 def find_random():
-    min, max = 6, 10
-    # params = {
-    #     "status": 'completed', 
-    #     "rating.kp": f'{min}-{max}',
-    #     "rating.imdb": f'{min}-{max}',
-    #     "rating.tmdb": f'{min}-{max}'
-    # }
+    min, max = 6, 10           #походу авторы апи убрали вообще рандомный поиск и остался только случайный поиск пез параметров
+    params = {
+        "status": 'completed', 
+        "ratingkp": f'{min}-{max}',
+        "ratingimdb": f'{min}-{max}',
+        "ratingtmdb": f'{min}-{max}'
+    }
 
-    response = requests.get(base_url + '/random' ,params=None, headers=headers)
+    response = requests.get(base_url + '/random' ,params=params, headers=headers)
 
     if response.status_code == 200:
         data = response.json()

@@ -1,0 +1,24 @@
+{
+  "users": {
+    "123456789": {
+      "username": "@username",
+      "watchlist": [
+        {
+          "movie_id": "tt0111161",
+          "title": "Побег из Шоушенка"
+        }
+      ]
+    },
+    "987654321": {
+      "username": "@other_user",
+      "watchlist": []
+    },
+    "1155566212": {
+      "username": "kulakvs",
+      "watchlist": []
+    }
+  },
+  "metadata": {
+    "total_users": 3
+  }
+}
