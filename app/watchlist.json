@@ -1,21 +1,30 @@
 {
   "users": {
     "123456789": {
-      "username": "@username",
+      "username": "username",
       "watchlist": [
         {
           "movie_id": "tt0111161",
-          "title": "Побег из Шоушенка"
+          "movie_title": "РљР°РєРѕР№С† С‚Рѕ С„РёР»СЊРј"
         }
       ]
     },
     "987654321": {
-      "username": "@other_user",
+      "username": "other_user",
       "watchlist": []
     },
     "1155566212": {
       "username": "kulakvs",
-      "watchlist": []
+      "watchlist": [
+        {
+          "movie_id": 515,
+          "movie_title": "На игле"
+        },
+        {
+          "movie_id": 453397,
+          "movie_title": "Оно"
+        }
+      ]
     }
   },
   "metadata": {
