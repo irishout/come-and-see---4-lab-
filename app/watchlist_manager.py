@@ -37,11 +37,11 @@ class WatchlistManager:
         except Exception as e:
             return f'Ошибка: {e}'
         
-    def delete_film(self, user_id, film_id):
+    def delete_film(self, user_id, film_id, film_title):
         try:
             film_for_delete = {
                 "movie_id": film_id,
-
+                "movie_title": film_title
                 }
             data = self._load_data()
             data["users"][str(user_id)]['watchlist'].remove(film_for_delete)

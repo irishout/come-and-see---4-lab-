@@ -19,6 +19,17 @@ class MovieSearch(StatesGroup):
     current_film = State()
     waiting_for_title = State()
 
+def get_data(data):
+    title = data["name"] if data["name"] else data["alternativeName"]
+    alt_title = data["alternativeName"] if data["alternativeName"] else "Информация отсутсвует"
+    description = data["description"] if data["description"] else "Информация отсутсвует"
+    raitingkp = data["rating"]["kp"] if int(data["rating"]["kp"]) > 0 else "Информация отсутсвует"
+    raitingIMDb = data["rating"]["imdb"] if int(data["rating"]["imdb"]) > 0 else "Информация отсутсвует"
+    raitingfilmCritics = data["rating"]["filmCritics"] if int(data["rating"]["filmCritics"]) > 0 else "Информация отсутсвует"
+    year = data["year"]
+
+    return title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year
+
 #команда старт
 @router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
@@ -45,16 +56,10 @@ async def random_movie(message: Message, state: FSMContext) -> None:
         url = data['poster']["url"]
         #url = data['poster']["url"] if data['poster']["url"] else 'https://media.istockphoto.com/id/1472933890/ru/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F/%D0%BD%D0%B5%D1%82-%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%BE%D0%B3%D0%BE-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%B0-%D0%B8%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D1%82%D1%81%D1%83%D1%82%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82-%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D0%B0%D1%8F-%D0%B8%D0%BA%D0%BE%D0%BD%D0%BA%D0%B0-%D0%BD%D0%B5%D1%82-%D0%B3%D0%B0%D0%BB%D0%B5%D1%80%D0%B5%D0%B8-%D0%B4%D0%BB%D1%8F.jpg?s=612x612&w=0&k=20&c=r3yGvPOiyDFrFiMGfq8K7ObJZwTsMscZug1wqI4Grpo='
         photo = URLInputFile(url)
-
-        title = data["name"] if data["name"] else data["alternativeName"]
-        alt_title = data["alternativeName"] if data["alternativeName"] else "Информация отсутсвует"
-        description = data["description"] if data["description"] else "Информация отсутсвует"
-        raitingkp = data["rating"]["kp"] if int(data["rating"]["kp"]) > 0 else "Информация отсутсвует"
-        raitingIMDb = data["rating"]["imdb"] if int(data["rating"]["imdb"]) > 0 else "Информация отсутсвует"
-        raitingfilmCritics = data["rating"]["filmCritics"] if int(data["rating"]["filmCritics"]) > 0 else "Информация отсутсвует"
-        year = data["year"] 
-
-        await message.answer('Ваш фильм:',reply_markup=kb.exit)
+   
+        title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year = get_data(data) 
+        flag = m.is_film_in_watchlist(message.from_user.id, data["id"])
+        await message.answer('Ваш фильм:',reply_markup=kb.main)
         await message.answer_photo(photo,caption= 
                                 f'🎬Название: {title}\n'
                                 '\n'
@@ -67,9 +72,9 @@ async def random_movie(message: Message, state: FSMContext) -> None:
                                 f'             IMDb: {raitingIMDb}\n'
                                 f'             filmCritics: {raitingfilmCritics}\n'
                                 '\n'
-                                f'📆Год: {year}', reply_markup=kb.main
+                                f'📆Год: {year}', reply_markup= kb.remove_film if flag else kb.film_menu
                                     )
-        id_and_title = [data["docs"][0]["id"], title]
+        id_and_title = [data["id"], title]
         await state.update_data(current_film = id_and_title)
         
     except Exception as e:
@@ -90,21 +95,15 @@ async def print_movie_by_name(message: Message, state: FSMContext) -> None:
 
     if movie_title != "Вернуться в меню":
         try:
-            data = am.find_by_name(movie_title)  
+            data = am.find_by_name(movie_title)["docs"][0]
 
-            url = data["docs"][0]['poster']["url"]
+            url = data['poster']["url"]
             photo = URLInputFile(url)
 
-            title = data["docs"][0]["name"] if data["docs"][0]["name"] else data["docs"][0]["alternativeName"]
-            alt_title = data["docs"][0]["alternativeName"] if data["docs"][0]["alternativeName"] else "Информация отсутсвует"
-            description = data["docs"][0]["description"] if data["docs"][0]["description"] else "Информация отсутсвует"
-            raitingkp = data["docs"][0]["rating"]["kp"] if int(data["docs"][0]["rating"]["kp"]) > 0 else "Информация отсутсвует"
-            raitingIMDb = data["docs"][0]["rating"]["imdb"] if int(data["docs"][0]["rating"]["imdb"]) > 0 else "Информация отсутсвует"
-            raitingfilmCritics = data["docs"][0]["rating"]["filmCritics"] if int(data["docs"][0]["rating"]["filmCritics"]) > 0 else "Информация отсутсвует"
-            year = data["docs"][0]["year"] 
+            title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year = get_data(data)
 
-            id_and_title = [data["docs"][0]["id"], title]   
-            flag = m.is_film_in_watchlist(message.from_user.id, data["docs"][0]["id"])
+            id_and_title = [data["id"], title]   
+            flag = m.is_film_in_watchlist(message.from_user.id, data["id"])
             print(flag)
             await message.answer('Ваш фильм:',reply_markup=kb.exit)
             await message.answer_photo(photo,caption= 
@@ -140,17 +139,20 @@ async def add_to_watchlist(callback: CallbackQuery, state: FSMContext) -> None:
     
     if not m.is_film_in_watchlist(user_id, id):
         m.save_film(user_id, id, title)
+        await callback.message.edit_reply_markup(reply_markup=kb.remove_film)
         await callback.answer('Вы добавили фильм')
-    await callback.answer('Фильм уже у вас в watchlist')
+    else:
+        await callback.answer('Фильм уже у вас в watchlist')
 
 @router.callback_query(F.data == 'remove_from_watchlist')
 async def remove_from_watchlist(callback: CallbackQuery, state: FSMContext) -> None:
     user_id = callback.from_user.id
     id_and_title = await state.get_data()
     id = id_and_title['current_film'][0]
+    title = id_and_title['current_film'][1]
 
-    m.delete_film_film(user_id, id)
-
+    m.delete_film(user_id, id, title)
+    await callback.message.edit_reply_markup(reply_markup=kb.film_menu)
     await callback.answer('Вы удалили фильм')
 
 @router.message(F.text == "Мой watchlist")
@@ -167,7 +169,55 @@ async def show_watchlist_menu(message: Message):
         await message.answer("Ваш список пуст. Добавьте фильмы")
         return None
     keyboard = kb.get_watchlist(user_id)
-    await message.answer("Ваш список:", reply_markup=keyboard)    
+    await message.answer("Ваш список:", reply_markup=keyboard) 
+
+@router.callback_query(F.data.startswith("view_film:"))
+async def view_film_from_watchlist(callback: CallbackQuery, state: FSMContext):
+    movie_id = callback.data.split(":", 1)[1]  # "view_film:515" → "515"
+
+    # Достаём фильм из watchlist пользователя
+    user_id = callback.from_user.id
+    user = m.get_user(user_id)
+    if not user:
+        await callback.answer("Пользователь не найден.", show_alert=True)
+        return
+
+    film = next(
+        (f for f in user.get("watchlist", []) if str(f["movie_id"]) == movie_id),
+        None
+    )
+
+    if not film:
+        await callback.answer("Фильм не найден.", show_alert=True)
+        return
+
+    # Показываем карточку фильма 
+    data = am.find_by_id(movie_id)
+    url = data['poster']["url"]
+    photo = URLInputFile(url)
+
+    title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year = get_data(data)
+
+    id_and_title = [data["id"], title]   
+    flag = m.is_film_in_watchlist(callback.from_user.id, data["id"])
+    
+    await callback.message.answer('Ваш фильм:',reply_markup=kb.exit)
+    await callback.message.answer_photo(photo,caption= 
+                            f'🎬Название: {title}\n'
+                            '\n'
+                            f'Альтернативное название:"{alt_title}"\n'
+                            '\n'
+                            f'📜Описание: {description}\n'
+                            '\n'
+                            f'⭐️Рейтинги:\n'
+                            f'             Кинопоиск: {raitingkp}\n' 
+                            f'             IMDb: {raitingIMDb}\n'
+                            f'             filmCritics: {raitingfilmCritics}\n'
+                            '\n'
+                            f'📆Год: {year}', reply_markup= kb.remove_film if flag else kb.film_menu
+                                ) 
+    await state.update_data(current_film = id_and_title)
+    await callback.answer() 
 
 
 @router.message()

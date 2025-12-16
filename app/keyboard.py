@@ -7,7 +7,7 @@ def get_watchlist(user_id):
     with open("app\watchlist.json", 'r', encoding='utf-8') as f:
         data = json.load(f)
         watchlist_keyboard = InlineKeyboardMarkup(inline_keyboard=
-        [[InlineKeyboardButton(text=film["movie_title"], callback_data=str(film["movie_id"]))] for film in data["users"][str(user_id)]["watchlist"]])
+        [[InlineKeyboardButton(text=film["movie_title"], callback_data=f'view_film:{str(film["movie_id"])}')] for film in data["users"][str(user_id)]["watchlist"]])
         return watchlist_keyboard
 
 
