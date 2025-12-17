@@ -54,7 +54,6 @@ async def random_movie(message: Message, state: FSMContext) -> None:
             data = am.find_random()
             
         url = data['poster']["url"]
-        #url = data['poster']["url"] if data['poster']["url"] else 'https://media.istockphoto.com/id/1472933890/ru/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%B0%D1%8F/%D0%BD%D0%B5%D1%82-%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D0%BE%D0%B3%D0%BE-%D1%81%D0%B8%D0%BC%D0%B2%D0%BE%D0%BB%D0%B0-%D0%B8%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D1%82%D1%81%D1%83%D1%82%D1%81%D1%82%D0%B2%D1%83%D0%B5%D1%82-%D0%B4%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%BD%D0%B0%D1%8F-%D0%B8%D0%BA%D0%BE%D0%BD%D0%BA%D0%B0-%D0%BD%D0%B5%D1%82-%D0%B3%D0%B0%D0%BB%D0%B5%D1%80%D0%B5%D0%B8-%D0%B4%D0%BB%D1%8F.jpg?s=612x612&w=0&k=20&c=r3yGvPOiyDFrFiMGfq8K7ObJZwTsMscZug1wqI4Grpo='
         photo = URLInputFile(url)
    
         title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year = get_data(data) 
@@ -138,7 +137,11 @@ async def add_to_watchlist(callback: CallbackQuery, state: FSMContext) -> None:
     title = id_and_title['current_film'][1]
     
     if not m.is_film_in_watchlist(user_id, id):
-        m.save_film(user_id, id, title)
+        result = m.save_film(user_id, id, title)
+        if result == "Превышен лимит фильмов в watchlist":
+            await callback.answer('Превышен лимит фильмов в watchlist')
+            return None
+
         await callback.message.edit_reply_markup(reply_markup=kb.remove_film)
         await callback.answer('Вы добавили фильм')
     else:

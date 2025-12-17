@@ -2,3 +2,5 @@ venv/
 __pycache__/
 api_keys.py
 movies_data/kinoAPI.py
+data analysis/
+app/watchlist.json

@@ -1,8 +1,17 @@
 import json
+import os
 
 class WatchlistManager:
     def __init__(self, file_path="app\watchlist.json"):
         self.file_path = file_path
+        self._ensure_file_exists()
+
+    def _ensure_file_exists(self):
+        if not os.path.exists(self.file_path):
+            os.makedirs(os.path.dirname(self.file_path), exist_ok=True)   
+            initial_data = {"users": {}, "metadata": {"total_users": ""}}
+            with open(self.file_path, 'w', encoding='utf-8') as f:
+                json.dump(initial_data, f, ensure_ascii=False, indent=2)        
         
     def _load_data(self):
         with open(self.file_path, 'r', encoding='utf-8') as f:

@@ -2,7 +2,6 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 import json 
 
 
-
 def get_watchlist(user_id):
     with open("app\watchlist.json", 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -10,9 +9,10 @@ def get_watchlist(user_id):
         [[InlineKeyboardButton(text=film["movie_title"], callback_data=f'view_film:{str(film["movie_id"])}')] for film in data["users"][str(user_id)]["watchlist"]])
         return watchlist_keyboard
 
+#Клава глав меню
+main_keyboard = [[KeyboardButton(text='Поиск фильма')],[KeyboardButton(text='Случайный фильм')], [KeyboardButton(text='Мой watchlist')]]
 
-main_keyboard = [[ KeyboardButton(text='Поиск фильма')],[KeyboardButton(text='Случайный фильм')], [KeyboardButton(text='Мой watchlist')]]
-
+#Возврат к глав меню
 exit_to_main = [[KeyboardButton(text='Вернуться в меню')]]
 
 film_menu = InlineKeyboardMarkup(inline_keyboard=[
