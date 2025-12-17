@@ -2,7 +2,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 import json 
 
 
-def get_watchlist(user_id):
+def get_watchlist(user_id):     #создание клавиатуры-списка для watchlist
     with open("app\watchlist.json", 'r', encoding='utf-8') as f:
         data = json.load(f)
         watchlist_keyboard = InlineKeyboardMarkup(inline_keyboard=

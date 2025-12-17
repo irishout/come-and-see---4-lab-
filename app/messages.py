@@ -30,6 +30,20 @@ def get_data(data):
 
     return title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year
 
+def photo_answer(title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year):
+    return (f'🎬Название: {title}\n'
+                                '\n'
+                                f'Альтернативное название:"{alt_title}"\n'
+                                '\n'
+                                f'📜Описание: {description}\n'
+                                '\n'
+                                f'⭐️Рейтинги:\n'
+                                f'             Кинопоиск: {raitingkp}\n' 
+                                f'             IMDb: {raitingIMDb}\n'
+                                f'             filmCritics: {raitingfilmCritics}\n'
+                                '\n'
+                                f'📆Год: {year}')
+
 #команда старт
 @router.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
@@ -59,19 +73,8 @@ async def random_movie(message: Message, state: FSMContext) -> None:
         title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year = get_data(data) 
         flag = m.is_film_in_watchlist(message.from_user.id, data["id"])
         await message.answer('Ваш фильм:',reply_markup=kb.main)
-        await message.answer_photo(photo,caption= 
-                                f'🎬Название: {title}\n'
-                                '\n'
-                                f'Альтернативное название:"{alt_title}"\n'
-                                '\n'
-                                f'📜Описание: {description}\n'
-                                '\n'
-                                f'⭐️Рейтинги:\n'
-                                f'             Кинопоиск: {raitingkp}\n' 
-                                f'             IMDb: {raitingIMDb}\n'
-                                f'             filmCritics: {raitingfilmCritics}\n'
-                                '\n'
-                                f'📆Год: {year}', reply_markup= kb.remove_film if flag else kb.film_menu
+        await message.answer_photo(photo,caption= photo_answer(title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year),
+                                    reply_markup= kb.remove_film if flag else kb.film_menu
                                     )
         id_and_title = [data["id"], title]
         await state.update_data(current_film = id_and_title)
@@ -105,19 +108,8 @@ async def print_movie_by_name(message: Message, state: FSMContext) -> None:
             flag = m.is_film_in_watchlist(message.from_user.id, data["id"])
             print(flag)
             await message.answer('Ваш фильм:',reply_markup=kb.exit)
-            await message.answer_photo(photo,caption= 
-                                    f'🎬Название: {title}\n'
-                                    '\n'
-                                    f'Альтернативное название:"{alt_title}"\n'
-                                    '\n'
-                                    f'📜Описание: {description}\n'
-                                    '\n'
-                                    f'⭐️Рейтинги:\n'
-                                    f'             Кинопоиск: {raitingkp}\n' 
-                                    f'             IMDb: {raitingIMDb}\n'
-                                    f'             filmCritics: {raitingfilmCritics}\n'
-                                    '\n'
-                                    f'📆Год: {year}', reply_markup= kb.remove_film if flag else kb.film_menu
+            await message.answer_photo(photo,caption= photo_answer(title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year),
+                                        reply_markup= kb.remove_film if flag else kb.film_menu
                                         ) 
             await state.update_data(current_film = id_and_title)
 
@@ -178,7 +170,7 @@ async def show_watchlist_menu(message: Message):
 async def view_film_from_watchlist(callback: CallbackQuery, state: FSMContext):
     movie_id = callback.data.split(":", 1)[1]  # "view_film:515" → "515"
 
-    # Достаём фильм из watchlist пользователя
+    #Достаём фильм из watchlist пользователя
     user_id = callback.from_user.id
     user = m.get_user(user_id)
     if not user:
@@ -194,7 +186,7 @@ async def view_film_from_watchlist(callback: CallbackQuery, state: FSMContext):
         await callback.answer("Фильм не найден.", show_alert=True)
         return
 
-    # Показываем карточку фильма 
+    #Показываем карточку фильма 
     data = am.find_by_id(movie_id)
     url = data['poster']["url"]
     photo = URLInputFile(url)
@@ -205,19 +197,8 @@ async def view_film_from_watchlist(callback: CallbackQuery, state: FSMContext):
     flag = m.is_film_in_watchlist(callback.from_user.id, data["id"])
     
     await callback.message.answer('Ваш фильм:',reply_markup=kb.exit)
-    await callback.message.answer_photo(photo,caption= 
-                            f'🎬Название: {title}\n'
-                            '\n'
-                            f'Альтернативное название:"{alt_title}"\n'
-                            '\n'
-                            f'📜Описание: {description}\n'
-                            '\n'
-                            f'⭐️Рейтинги:\n'
-                            f'             Кинопоиск: {raitingkp}\n' 
-                            f'             IMDb: {raitingIMDb}\n'
-                            f'             filmCritics: {raitingfilmCritics}\n'
-                            '\n'
-                            f'📆Год: {year}', reply_markup= kb.remove_film if flag else kb.film_menu
+    await callback.message.answer_photo(photo,caption= photo_answer(title, alt_title, description, raitingkp, raitingIMDb, raitingfilmCritics, year), 
+                                        reply_markup= kb.remove_film if flag else kb.film_menu
                                 ) 
     await state.update_data(current_film = id_and_title)
     await callback.answer() 
